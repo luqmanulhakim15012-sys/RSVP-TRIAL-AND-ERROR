@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Walimatul Urus Lyn & Luqman</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Great+Vibes&family=Lora:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #a87b83; /* Dusty rose from batik picture */
+            --text-dark: #6e6360;
+            --text-light: #9c918e;
+            --bg-base: #fbf9f8; /* Soft white/cream base */
+            --card-bg: rgba(255, 255, 255, 0.9); /* Lighter glassmorphism */
+            --countdown-bg: rgba(240, 235, 232, 0.8); 
+            --gold-accent: #bdafa3;
+            --border-color: #e6dfdf;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background-color: #1a1a1a; 
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* Mobile Container Simulation */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background-color: var(--bg-base);
+            position: relative;
+            overflow: hidden; /* Hide anything outside */
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* =========================================
+           ART BACKGROUND (FIXED LAYER)
+           ========================================= */
+        .art-background {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none; /* Let clicks pass through to scroll area */
+        }
+
+        .batik-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        /* Floral SVGs */
+        .floral-svg {
+            position: absolute;
+            z-index: 3;
+            pointer-events: none;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.03));
+        }
+        .floral-tl { top: -20px; left: -20px; width: 300px; height: 300px; }
+        .floral-tr { top: 40px; right: -40px; width: 200px; height: 200px; }
+        .floral-bl { bottom: 20px; left: -40px; width: 300px; height: 400px; }
+        .floral-br { bottom: -20px; right: -20px; width: 350px; height: 350px; }
+        .floral-bc { bottom: -20px; left: 50%; transform: translateX(-50%); width: 200px; height: 150px; }
+
+        /* 4. Falling Petals */
+        .petals-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+        }
+        .petal {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle at top left, #eee1e3, #c59ca3);
+            border-radius: 50% 0 50% 50%; /* Teardrop shape */
+            animation: fall linear infinite;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg) translateX(50px); opacity: 0; }
+        }
+
+        /* =========================================
+           CONTENT WRAPPER (SCROLLING LAYER)
+           ========================================= */
+        .content-wrapper {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 10;
+            scroll-behavior: smooth;
+        }
+
+        /* ---------------- WELCOME SCREEN ---------------- */
+        #welcome-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+            padding: 2rem;
+            z-index: 100;
+            /* Transparent to show the fixed art background */
+            background: transparent; 
+        }
+
+        #welcome-screen.hide {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+        }
+
+        .welcome-names {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4.8rem;
+            color: var(--primary-color);
+            line-height: 1;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .welcome-sub {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            color: var(--text-dark);
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .btn-open {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(146, 60, 77, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-open:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(146, 60, 77, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(146, 60, 77, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(146, 60, 77, 0); }
+        }
+
+        /* ---------------- MAIN CONTENT ---------------- */
+        #main-content {
+            padding: 2rem 1.5rem 4rem 1.5rem;
+            position: relative;
+            opacity: 0;
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeInContent 1.5s ease-out forwards;
+            min-height: 100vh;
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Music Button */
+        #music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            backdrop-filter: blur(5px);
+            color: var(--text-dark);
+            font-size: 0.55rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            flex-direction: column;
+        }
+        
+        #music-toggle svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .playing svg {
+            animation: rotateMusic 4s linear infinite;
+        }
+
+        @keyframes rotateMusic {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Typography & Structure */
+        .bismillah {
+            width: 180px;
+            margin: 1rem auto;
+            opacity: 0.85;
+        }
+
+        .intro-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .names-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 5.5rem;
+            color: var(--primary-color);
+            line-height: 0.85;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .names-title span.ampersand {
+            font-size: 2.2rem;
+            margin: 10px 0;
+            color: var(--primary-color);
+            opacity: 0.8;
+        }
+
+        .event-type {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .invite-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            padding: 0 10px;
+            color: var(--text-dark);
+        }
+
+        /* Details Card Redesigned */
+        .details-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 120px 120px 15px 15px; /* Curved Arch Top */
+            padding: 3rem 1.5rem 2rem 1.5rem;
+            width: 100%;
+            position: relative;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            margin-top: 1rem;
+            backdrop-filter: blur(8px); /* Glassmorphism to show beautiful background */
+        }
+
+        /* Inner Double Line */
+        .details-card::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 114px 114px 10px 10px;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Small flower top center of card */
+        .card-flower {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: var(--bg-base);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3px;
+        }
+        
+        .card-flower svg {
+            width: 20px;
+            height: 20px;
+            fill: #de8897;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .section-title::before, .section-title::after {
+            content: '»';
+            color: var(--gold-accent);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+        .section-title::before { content: '«'; }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            gap: 15px;
+        }
+
+        .info-icon {
+            background-color: rgba(146, 60, 77, 0.08);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(146, 60, 77, 0.15);
+        }
+
+        .info-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--primary-color);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .info-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-bold {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .info-sub {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .highlight-text {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-top: 3px;
+            font-size: 0.85rem;
+        }
+
+        /* Countdown */
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .countdown-item {
+            background-color: var(--countdown-bg);
+            border-radius: 8px;
+            padding: 15px 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .countdown-item::after {
+            content: ':';
+            position: absolute;
+            right: -6px;
+            top: 20px;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .countdown-item:last-child::after { display: none; }
+
+        .cd-num {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .cd-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        /* Location Section */
+        .location-section {
+            margin-bottom: 3rem;
+            width: 100%;
+        }
+
+        .loc-icon-large {
+            margin-bottom: 10px;
+        }
+        
+        .loc-icon-large svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--primary-color);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .loc-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .loc-address {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .btn-maps {
+            display: inline-block;
+            padding: 8px 20px;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-maps:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* RSVP Form */
+        .rsvp-section {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(8px); /* Matches glassmorphism */
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .rsvp-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .form-control {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Lora', serif;
+            font-size: 0.95rem;
+            background-color: rgba(255,255,255,0.9);
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Lora', serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #7a3240;
+        }
+
+        /* Custom Alert Modal */
+        #custom-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .alert-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            width: 80%;
+            max-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .alert-icon {
+            color: #4CAF50;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-box h3 {
+            font-family: 'Cinzel', serif;
+            margin-bottom: 10px;
+        }
+
+        .alert-box p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .alert-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+        }
+
+        /* Divider */
+        .divider {
+            width: 40%;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1.5rem auto;
+            position: relative;
+        }
+        .divider::after {
+            content: '♥';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-base);
+            padding: 0 10px;
+            color: #de8897;
+            font-size: 0.7rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- =========================================
+             ART BACKGROUND LAYER (FIXED & IMMERSIVE)
+             ========================================= -->
+        <div class="art-background">
+            
+            <!-- Global SVG Definitions for Batik & Flowers -->
+            <svg width="0" height="0" style="position: absolute;">
+                <defs>
+                    <!-- Batik Background Pattern -->
+                    <pattern id="batik-bg-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="none" stroke="#ede6e4" stroke-width="2"/>
+                        <path d="M50 10 L90 50 L50 90 L10 50 Z" fill="none" stroke="#ede6e4" stroke-width="0.75"/>
+                        <circle cx="50" cy="50" r="18" fill="none" stroke="#ede6e4" stroke-width="1.5"/>
+                        <circle cx="50" cy="50" r="6" fill="#ede6e4"/>
+                        <circle cx="50" cy="0" r="4" fill="#ede6e4"/>
+                        <circle cx="100" cy="50" r="4" fill="#ede6e4"/>
+                        <circle cx="0" cy="50" r="4" fill="#ede6e4"/>
+                        <circle cx="50" cy="100" r="4" fill="#ede6e4"/>
+                        <path d="M25 25 Q 50 10 75 25 Q 90 50 75 75 Q 50 90 25 75 Q 10 50 25 25" fill="none" stroke="#ede6e4" stroke-width="1"/>
+                    </pattern>
+
+                    <!-- Batik Dot Texture -->
+                    <pattern id="batik-dots" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                        <circle cx="2" cy="2" r="1.2" fill="#ffffff" opacity="0.7"/>
+                        <circle cx="6" cy="6" r="0.8" fill="#ffffff" opacity="0.5"/>
+                        <circle cx="2" cy="6" r="0.8" fill="#ffffff" opacity="0.3"/>
+                    </pattern>
+
+                    <!-- Floral Gradients -->
+                    <linearGradient id="lily-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#dcbac0"/>
+                        <stop offset="100%" stop-color="#b58c94"/>
+                    </linearGradient>
+                    <linearGradient id="leaf-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e0ded6"/>
+                        <stop offset="100%" stop-color="#b8b4a5"/>
+                    </linearGradient>
+
+                    <!-- Reusable Flower Petal -->
+                    <g id="lily-petal">
+                        <path d="M0,0 C18,-20 25,-50 0,-70 C-25,-50 -18,-20 0,0 Z" fill="url(#lily-grad)"/>
+                        <path d="M0,0 C18,-20 25,-50 0,-70 C-25,-50 -18,-20 0,0 Z" fill="url(#batik-dots)"/>
+                        <path d="M0,0 L0,-45" stroke="#fff" stroke-width="1.5" opacity="0.6"/>
+                    </g>
+                    
+                    <!-- Reusable Leaf -->
+                    <g id="batik-leaf">
+                        <path d="M0,0 C30,-20 60,-50 80,-100 C50,-80 20,-50 0,0 Z" fill="url(#leaf-grad)"/>
+                        <path d="M0,0 C30,-20 60,-50 80,-100 C50,-80 20,-50 0,0 Z" fill="url(#batik-dots)"/>
+                        <path d="M0,0 Q35,-50 80,-100" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.7"/>
+                    </g>
+
+                    <!-- Complete Flower -->
+                    <g id="batik-flower">
+                        <use href="#lily-petal" transform="rotate(0)"/>
+                        <use href="#lily-petal" transform="rotate(72)"/>
+                        <use href="#lily-petal" transform="rotate(144)"/>
+                        <use href="#lily-petal" transform="rotate(216)"/>
+                        <use href="#lily-petal" transform="rotate(288)"/>
+                        <circle cx="0" cy="0" r="8" fill="#fff" opacity="0.9"/>
+                        <circle cx="0" cy="0" r="4" fill="#a87b83"/>
+                        <circle cx="4" cy="-4" r="1.5" fill="#fff"/>
+                    </g>
+                </defs>
+            </svg>
+
+            <!-- Full Screen Batik Lattice -->
+            <svg class="batik-overlay" width="100%" height="100%">
+                <rect width="100%" height="100%" fill="url(#batik-bg-pattern)"/>
+            </svg>
+
+            <!-- Top Left Cluster -->
+            <svg class="floral-svg floral-tl" viewBox="0 0 300 300">
+                <g transform="translate(60, 60) rotate(-135) scale(1.2)"><use href="#batik-leaf"/></g>
+                <g transform="translate(140, 110) rotate(-160) scale(1)"><use href="#batik-leaf"/></g>
+                <g transform="translate(60, 60) scale(1.3)"><use href="#batik-flower"/></g>
+                <g transform="translate(180, 40) scale(0.8)"><use href="#batik-flower"/></g>
+                <g transform="translate(30, 160) scale(0.9)"><use href="#batik-flower"/></g>
+            </svg>
+
+            <!-- Top Right Small Cluster -->
+            <svg class="floral-svg floral-tr" viewBox="0 0 200 200">
+                <g transform="translate(120, 80) rotate(135) scale(1)"><use href="#batik-leaf"/></g>
+                <g transform="translate(140, 60) scale(1)"><use href="#batik-flower"/></g>
+            </svg>
+
+            <!-- Bottom Left Cluster -->
+            <svg class="floral-svg floral-bl" viewBox="0 0 300 400">
+                <g transform="translate(60, 320) rotate(20) scale(1.4)"><use href="#batik-leaf"/></g>
+                <g transform="translate(140, 220) rotate(45) scale(1.2)"><use href="#batik-leaf"/></g>
+                <g transform="translate(200, 120) rotate(70) scale(0.9)"><use href="#batik-leaf"/></g>
+                
+                <g transform="translate(80, 300) scale(1.5)"><use href="#batik-flower"/></g>
+                <g transform="translate(180, 200) scale(1.1)"><use href="#batik-flower"/></g>
+                <g transform="translate(80, 180) scale(0.8)"><use href="#batik-flower"/></g>
+            </svg>
+
+            <!-- Bottom Right Cluster -->
+            <svg class="floral-svg floral-br" viewBox="0 0 350 350">
+                <g transform="translate(250, 250) rotate(-40) scale(1.5)"><use href="#batik-leaf"/></g>
+                <g transform="translate(160, 180) rotate(-65) scale(1.2)"><use href="#batik-leaf"/></g>
+                <g transform="translate(80, 110) rotate(-85) scale(0.9)"><use href="#batik-leaf"/></g>
+                
+                <g transform="translate(250, 250) scale(1.6)"><use href="#batik-flower"/></g>
+                <g transform="translate(150, 180) scale(1.2)"><use href="#batik-flower"/></g>
+                <g transform="translate(280, 130) scale(0.9)"><use href="#batik-flower"/></g>
+            </svg>
+
+            <!-- Bottom Center Accent -->
+            <svg class="floral-svg floral-bc" viewBox="0 0 200 150">
+                <g transform="translate(60, 120) rotate(-50) scale(0.8)"><use href="#batik-leaf"/></g>
+                <g transform="translate(140, 120) rotate(50) scale(0.8)"><use href="#batik-leaf"/></g>
+                <g transform="translate(100, 130) scale(1.1)"><use href="#batik-flower"/></g>
+            </svg>
+
+            <!-- Falling Petals Container -->
+            <div class="petals-container" id="petals">
+                <div class="petal" style="left: 10%; animation-duration: 9s; animation-delay: 0s;"></div>
+                <div class="petal" style="left: 30%; animation-duration: 13s; animation-delay: 2s; transform: scale(0.8);"></div>
+                <div class="petal" style="left: 50%; animation-duration: 10s; animation-delay: 4s;"></div>
+                <div class="petal" style="left: 70%; animation-duration: 12s; animation-delay: 1s; transform: scale(1.2);"></div>
+                <div class="petal" style="left: 90%; animation-duration: 11s; animation-delay: 3s;"></div>
+            </div>
+
+        </div>
+
+        <!-- =========================================
+             CONTENT WRAPPER (SCROLLS OVER BACKGROUND)
+             ========================================= -->
+        <div class="content-wrapper" id="content-scroll">
+            
+            <!-- WELCOME SCREEN -->
+            <div id="welcome-screen">
+                <h1 class="welcome-names">Lyn<br>&<br>Luqman</h1>
+                <p class="welcome-sub">WALIMATUL URUS</p>
+                
+                <button class="btn-open" id="open-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    Buka Kad
+                </button>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div id="main-content">
+                
+                <!-- Hidden Audio Element -->
+                <audio id="bg-music" loop>
+                    <source src="https://assets.mixkit.co/music/preview/mixkit-wedding-dreams-239.mp3" type="audio/mpeg">
+                </audio>
+
+                <div id="music-toggle" class="playing">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 18V5l12-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                    <span>MUSIC<br>ON</span>
+                </div>
+
+                <!-- Bismillah -->
+                <div class="bismillah">
+                    <svg viewBox="0 0 400 100" fill="currentColor">
+                        <path d="M189.6,48.2c0.8-0.9,1.6-1.5,2.4-2c0.7-0.4,1.4-0.6,2-0.6c0.6,0,1.2,0.2,1.7,0.5c0.5,0.4,0.7,0.9,0.7,1.6 c0,0.7-0.3,1.4-0.8,2.1c-0.5,0.7-1.1,1.3-1.8,1.7c-0.7,0.4-1.3,0.6-2,0.6c-0.6,0-1.1-0.2-1.5-0.5C189.9,51.3,189.6,50.7,189.6,48.2z M204.4,48.2c0.8-0.9,1.6-1.5,2.4-2c0.7-0.4,1.4-0.6,2-0.6c0.6,0,1.2,0.2,1.7,0.5c0.5,0.4,0.7,0.9,0.7,1.6c0,0.7-0.3,1.4-0.8,2.1 c-0.5,0.7-1.1,1.3-1.8,1.7c-0.7,0.4-1.3,0.6-2,0.6c-0.6,0-1.1-0.2-1.5-0.5C204.7,51.3,204.4,50.7,204.4,48.2z M219.2,48.2 c0.8-0.9,1.6-1.5,2.4-2c0.7-0.4,1.4-0.6,2-0.6c0.6,0,1.2,0.2,1.7,0.5c0.5,0.4,0.7,0.9,0.7,1.6c0,0.7-0.3,1.4-0.8,2.1 c-0.5,0.7-1.1,1.3-1.8,1.7c-0.7,0.4-1.3,0.6-2,0.6c-0.6,0-1.1-0.2-1.5-0.5C219.5,51.3,219.2,50.7,219.2,48.2z M174.5,60.6 c1-1.3,2-2.3,3-3c1-0.8,2-1.2,3.1-1.2c1.1,0,2.1,0.4,3,1.1c0.9,0.7,1.4,1.7,1.4,2.9c0,1.4-0.5,2.7-1.4,4c-1,1.3-2,2.2-3,2.9 c-1.1,0.7-2.1,1.1-3.2,1.1c-1.1,0-2-0.4-2.9-1.1C173.5,66.6,173.1,65.5,173.1,64C173.1,63.1,173.6,61.9,174.5,60.6z"/>
+                        <text x="200" y="40" font-family="'Cinzel', serif" font-size="30" text-anchor="middle">﷽</text>
+                    </svg>
+                </div>
+
+                <div class="intro-text">
+                    DENGAN NAMA ALLAH<br>YANG MAHA PEMURAH LAGI MAHA PENYAYANG
+                </div>
+
+                <h1 class="names-title">
+                    Lyn
+                    <span class="ampersand">&</span>
+                    Luqman
+                </h1>
+
+                <div class="divider" style="width: 20px; border-color: transparent;">♥</div>
+
+                <div class="event-type">WALIMATUL URUS</div>
+                
+                <p class="invite-text">
+                    Dengan penuh kesyukuran dan hormatnya,<br>
+                    kami menjemput Dato'/Datin/Tuan/Puan/Encik/Cik<br>
+                    ke majlis perkahwinan kami.
+                </p>
+
+                <!-- Details Card -->
+                <div class="details-card">
+                    <div class="card-flower">
+                        <svg viewBox="0 0 24 24"><path d="M12 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-8-8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm18 0c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm-6.41-5.18c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0 .78 2.05 0 2.83-2.05.78-2.83 0zM5.59 17.59c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0 .78 2.05 0 2.83-2.05.78-2.83 0zm12.82 0c.78-.78.78-2.05 0-2.83s-2.05-.78-2.83 0-.78 2.05 0 2.83 2.05.78 2.83 0zM5.59 6.41c.78.78.78 2.05 0 2.83s-2.05.78-2.83 0-.78-2.05 0-2.83 2.05-.78 2.83 0zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    </div>
+
+                    <div class="section-title">SAVE THE DATE</div>
+                    
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-bold">SABTU, 5 SEPTEMBER 2026</div>
+                            <div class="info-sub">(Rabi' I 23, 1448 AH)</div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-bold">MASA</div>
+                            <div class="info-sub">11:00 PAGI - 4:00 PETANG</div>
+                            <div class="highlight-text">BERSANDING: 12:30 TENGAH HARI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Countdown -->
+                <div class="section-title">COUNTDOWN TO OUR BIG DAY</div>
+                <div class="countdown-container">
+                    <div class="countdown-item">
+                        <div class="cd-num" id="cd-hari">00</div>
+                        <div class="cd-label">HARI</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="cd-num" id="cd-jam">00</div>
+                        <div class="cd-label">JAM</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="cd-num" id="cd-minit">00</div>
+                        <div class="cd-label">MINIT</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="cd-num" id="cd-saat">00</div>
+                        <div class="cd-label">SAAT</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Location -->
+                <div class="location-section">
+                    <div class="section-title">LOKASI</div>
+                    <div class="loc-icon-large">
+                        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
+                    <div class="loc-title">DZ HALL</div>
+                    <div class="loc-address">
+                        Lot 3875 B, Jalan Kuala Krai,<br>
+                        Kampung Tunjung,<br>
+                        16010 Kota Bharu,<br>
+                        Kelantan
+                    </div>
+                    <a href="#" class="btn-maps" onclick="event.preventDefault(); document.getElementById('custom-alert').style.display='flex';">Buka Google Maps</a>
+                </div>
+
+                <!-- RSVP Form Section -->
+                <div class="rsvp-section" id="rsvp">
+                    <div class="section-title">PENGESAHAN KEHADIRAN</div>
+                    <form class="rsvp-form" id="rsvpForm">
+                        <div class="form-group">
+                            <label for="name">Nama Penuh</label>
+                            <input type="text" id="name" class="form-control" placeholder="Masukkan nama anda" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">No. Telefon</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="0123456789" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kehadiran</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="attendance" value="Hadir" checked> Hadir
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="attendance" value="Tidak Hadir"> Tidak Hadir
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="pax-group">
+                            <label for="pax">Jumlah Kehadiran (Pax)</label>
+                            <select id="pax" class="form-control">
+                                <option value="1">1 Orang</option>
+                                <option value="2">2 Orang</option>
+                                <option value="3">3 Orang</option>
+                                <option value="4">4 Orang</option>
+                                <option value="5">5 Orang</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="wish">Ucapan (Pilihan)</label>
+                            <textarea id="wish" class="form-control" placeholder="Tuliskan ucapan anda..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Hantar RSVP</button>
+                    </form>
+                </div>
+                
+                <div style="height: 60px;"></div> <!-- Bottom padding -->
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert">
+        <div class="alert-box">
+            <div class="alert-icon">✓</div>
+            <h3>Terima Kasih!</h3>
+            <p id="alert-message">RSVP anda telah berjaya dihantar.</p>
+            <button class="alert-btn" onclick="document.getElementById('custom-alert').style.display='none'">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Elements ---
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const mainContent = document.getElementById('main-content');
+            const contentScroll = document.getElementById('content-scroll');
+            const openBtn = document.getElementById('open-btn');
+            const musicToggle = document.getElementById('music-toggle');
+            const bgMusic = document.getElementById('bg-music');
+            const petalsContainer = document.getElementById('petals');
+            const rsvpForm = document.getElementById('rsvpForm');
+            const attendanceRadios = document.getElementsByName('attendance');
+            const paxGroup = document.getElementById('pax-group');
+
+            // --- Open Card Logic ---
+            openBtn.addEventListener('click', () => {
+                // Hide welcome screen text
+                welcomeScreen.classList.add('hide');
+                
+                // Wait for animation to finish then show main content
+                setTimeout(() => {
+                    welcomeScreen.style.display = 'none';
+                    mainContent.style.display = 'flex'; 
+                    petalsContainer.style.opacity = '1'; // Fade in petals seamlessly over background
+                    
+                    // Reset scroll to top just in case
+                    contentScroll.scrollTop = 0;
+                    
+                    // Try to play music
+                    try {
+                        bgMusic.volume = 0.5;
+                        bgMusic.play();
+                    } catch (e) {
+                        console.log("Auto-play blocked");
+                        musicToggle.classList.remove('playing');
+                        musicToggle.querySelector('span').innerText = "MUSIC\nOFF";
+                    }
+                }, 800);
+            });
+
+            // --- Music Toggle Logic ---
+            let isPlaying = true;
+            musicToggle.addEventListener('click', () => {
+                const span = musicToggle.querySelector('span');
+                if (isPlaying) {
+                    bgMusic.pause();
+                    musicToggle.classList.remove('playing');
+                    span.innerText = "MUSIC\nOFF";
+                } else {
+                    bgMusic.play();
+                    musicToggle.classList.add('playing');
+                    span.innerText = "MUSIC\nON";
+                }
+                isPlaying = !isPlaying;
+            });
+
+            // --- Countdown Timer Logic ---
+            const countDownDate = new Date("Sep 5, 2026 11:00:00").getTime();
+
+            const updateCountdown = () => {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+
+                if (distance < 0) {
+                    document.getElementById("cd-hari").innerText = "00";
+                    document.getElementById("cd-jam").innerText = "00";
+                    document.getElementById("cd-minit").innerText = "00";
+                    document.getElementById("cd-saat").innerText = "00";
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("cd-hari").innerText = days.toString().padStart(2, '0');
+                document.getElementById("cd-jam").innerText = hours.toString().padStart(2, '0');
+                document.getElementById("cd-minit").innerText = minutes.toString().padStart(2, '0');
+                document.getElementById("cd-saat").innerText = seconds.toString().padStart(2, '0');
+            };
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            // --- RSVP Form Logic ---
+            attendanceRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.value === 'Tidak Hadir') {
+                        paxGroup.style.display = 'none';
+                        document.getElementById('pax').value = "0";
+                    } else {
+                        paxGroup.style.display = 'flex';
+                        document.getElementById('pax').value = "1";
+                    }
+                });
+            });
+
+            rsvpForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const attendance = document.querySelector('input[name="attendance"]:checked').value;
+                
+                let message = `Terima kasih ${name}! RSVP anda telah direkodkan.`;
+                if(attendance === 'Tidak Hadir') {
+                     message = `Terima kasih ${name}. Kami menghargai maklum balas anda.`;
+                }
+
+                document.getElementById('alert-message').innerText = message;
+                document.getElementById('custom-alert').style.display = 'flex';
+                
+                rsvpForm.reset();
+                paxGroup.style.display = 'flex';
+            });
+        });
+    </script>
+</body>
+</html>
