@@ -840,9 +840,9 @@
             <!-- MAIN CONTENT -->
             <div id="main-content">
                 
-                <!-- Hidden Audio Element -->
-                <audio id="bg-music" loop>
-                    <source src="https://assets.mixkit.co/music/preview/mixkit-wedding-dreams-239.mp3" type="audio/mpeg">
+                <!-- Audio Element for Uploaded MP3 -->
+                <audio id="bg-music" loop preload="auto">
+                    <source src="Sedetik Lebih - Anuar Zain.mp3" type="audio/mpeg">
                 </audio>
 
                 <div id="music-toggle" class="playing">
@@ -1028,46 +1028,58 @@
             const attendanceRadios = document.getElementsByName('attendance');
             const paxGroup = document.getElementById('pax-group');
 
+            // --- Preload Audio to help with playback ---
+            bgMusic.load();
+
             // --- Open Card Logic ---
             openBtn.addEventListener('click', () => {
                 // Hide welcome screen text
                 welcomeScreen.classList.add('hide');
                 
+                // Immediately try to play music on user click to bypass browser restrictions
+                bgMusic.volume = 0.6;
+                const playPromise = bgMusic.play();
+
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        // Playback started successfully
+                        musicToggle.classList.add('playing');
+                        musicToggle.querySelector('span').innerText = "MUSIC\nON";
+                        musicToggle.classList.remove('attention-pulse');
+                    }).catch(error => {
+                        // Auto-play was prevented by the phone/browser
+                        console.log("Audio play prevented:", error);
+                        musicToggle.classList.remove('playing');
+                        musicToggle.querySelector('span').innerText = "MUSIC\nOFF";
+                        
+                        // Add pulsing effect to the button so the user knows they need to click it manually
+                        musicToggle.classList.add('attention-pulse');
+                    });
+                }
+                
                 // Wait for animation to finish then show main content
                 setTimeout(() => {
                     welcomeScreen.style.display = 'none';
                     mainContent.style.display = 'flex'; 
-                    petalsContainer.style.opacity = '1'; // Fade in petals seamlessly over background
-                    
-                    // Reset scroll to top just in case
+                    petalsContainer.style.opacity = '1'; 
                     contentScroll.scrollTop = 0;
-                    
-                    // Try to play music
-                    try {
-                        bgMusic.volume = 0.5;
-                        bgMusic.play();
-                    } catch (e) {
-                        console.log("Auto-play blocked");
-                        musicToggle.classList.remove('playing');
-                        musicToggle.querySelector('span').innerText = "MUSIC\nOFF";
-                    }
                 }, 800);
             });
 
             // --- Music Toggle Logic ---
-            let isPlaying = true;
             musicToggle.addEventListener('click', () => {
                 const span = musicToggle.querySelector('span');
-                if (isPlaying) {
+                musicToggle.classList.remove('attention-pulse'); // Remove pulse if clicked
+
+                if (!bgMusic.paused) {
                     bgMusic.pause();
                     musicToggle.classList.remove('playing');
                     span.innerText = "MUSIC\nOFF";
                 } else {
-                    bgMusic.play();
+                    bgMusic.play().catch(e => console.log("Play failed", e));
                     musicToggle.classList.add('playing');
                     span.innerText = "MUSIC\nON";
                 }
-                isPlaying = !isPlaying;
             });
 
             // --- Countdown Timer Logic ---
